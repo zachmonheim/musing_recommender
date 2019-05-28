@@ -14,7 +14,7 @@ import numpy as np
 from builtins import int
 
 #read in csv file
-data = pd.read_csv('C:\\Users\\zmonh\\datasets\\smallMock.csv')
+data = pd.read_csv('dataset.csv')
 
 data_germany = data.drop('user_id', 1)
 
@@ -84,11 +84,6 @@ for i in range(scoreSize):
     score_matrix[int(scores[i][1]), int(scores[i][2])] = scores[i][0]
 
 
-'''
-to round matrix if decimals present
-
-np.around(score_matrix, decimals=0)
-'''
 print(score_matrix)
 
 

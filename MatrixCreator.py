@@ -16,15 +16,6 @@ from builtins import int
 #read in csv file
 data = pd.read_csv('dataset.csv')
 
-data_germany = data.drop('user_id', 1)
-
-
-print(data.columns)
-
-#three columns to keep track of 
-print(data.get(['watch_time']))
-print(data.get(['watch_time']).to_numpy()[5])
-
 
 #creates an array of zeros to hold [score, user_id, item_id]
 scoreSize = data.get(['user_id']).__len__()
@@ -85,10 +76,4 @@ for i in range(scoreSize):
 
 
 print(score_matrix)
-
-
-
-
-
-
 

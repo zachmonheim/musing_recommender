@@ -1,6 +1,8 @@
 '''
 Matrix Factorization implementation
 
+Credit: Albert Au Yeung
+
 Created on May 27, 2019
 
 @author: Zach Monheim
@@ -111,13 +113,7 @@ R = np.array([
 
 mf = MF(R, K=2, alpha=0.1, beta=0.01, iterations=20)
 
-mf.train()
-mf.train()
-mf.train()
-mf.train()
-mf.train()
-print(mf.sgd())
-print(mf.get_rating(4, 3))
+
 np.set_printoptions(precision=3)
 print(mf.full_matrix())
 

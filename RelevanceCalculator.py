@@ -1,9 +1,10 @@
 '''
 Finds relevance between videos based on the keywords present in a set of videos
+Finds top 3 recommendations for user
 
 Created on May 31, 2019
 
-@author: zmonh
+@author: Zach Monheim
 '''
 import random
 import math
@@ -34,11 +35,7 @@ for i in range(1,1001):
     x = random.sample(keywords, itemAmount)
     itemIDs.append(x)
 
-print(itemIDs[0])
-print(itemIDs[2])
-print(itemIDs[3])
-print(itemIDs[4])
-print(itemIDs[5])
+
 '''
 find vids function finds vids with a certain keyword
 
@@ -63,7 +60,7 @@ def findVids(word, V):
         index += 1
     return listV
 
-print(findVids(302, itemIDs))
+
 
 '''
 counts how many videos include the keyword
@@ -88,49 +85,7 @@ def numVids(w, V):
                 j += len(V[index])
         index += 1
     return count
-print(numVids(302, itemIDs))
 
-'''
-the distance of two vids based on their keywords in common?
-
-input:
-id1 = keyword list of v
-id2 = keyword list of v*
-V = list of videos (each video has it's own list of keywords
-
-output:
-list of distances between vids
-
-example call:
-distance = distancesOfVids(keywords)
-'''
-def distancesOfVids(V):
-    dist = []
-    N = len(V)
-    
-    for i in V:
-        for word, val in i.items():
-            if val > 0:
-                dist.append(1)
-    
-    for word, val in dist.items():
-        dist[word] = math.log10(N/float(val))
-        
-    return dist
-
-def distanceOfVids(id1, id2, V):
-    N = len(V)
-        
-    dist = dict.fromkeys(V[0].keys(), 0)
-    for i in dist:
-        for word, val in i.items():
-            if val > 0:
-                dist[word] += 1
-    
-    for word in dist.items():
-        dist[word] = math.log10(N/numVids(word, V))
-    
-    return dist
 
 '''
 dist of vid finds distance of a vid at a specified index
@@ -155,11 +110,6 @@ def distOfVid(index, V):
     for i in dist:
         sumOfVid += i
     return sumOfVid
-print(distOfVid(0, itemIDs))
-print(distOfVid(2, itemIDs))
-print(distOfVid(3, itemIDs))
-print(distOfVid(4, itemIDs))
-print(distOfVid(5, itemIDs))
 
 
 
@@ -183,7 +133,6 @@ def relevance(V):
         rel.append(1/distOfVid(index, V))
         index += 1
     return rel
-#print(relevance(itemIDs))
 
 '''
 sort videos in terms of relevance
@@ -192,10 +141,6 @@ for ascending order take out reverse parameter
 '''
 def sortRel(V):
     return sorted(range(len(relevance(V))), key=relevance(V).__getitem__, reverse=True)
-#print(sortRel(itemIDs))
-'''
-find which videos user has not seen?
-'''
 
 
 def top3(V, U):

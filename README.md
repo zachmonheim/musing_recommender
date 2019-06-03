@@ -16,5 +16,5 @@ pip install sklearn
 ```python
 MatrixCreator #creates matrix after reading csv file
 MatrixFactorization #factorizes matrix with training algorithm
-TFIDF #find inverse frequency of keywords for users and items
+RelevanceCalculator #find relevance of keywords for items based on users
 ```

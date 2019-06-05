@@ -10,6 +10,7 @@ import random
 import math
 import numpy
 from pip._vendor.msgpack.fallback import xrange
+import collections
 
 #create list of 1000 keywords
 keywords = []
@@ -27,7 +28,6 @@ for i in range(0,1000):
     x = random.sample(keywords, userAmount)
     userIDs.append(x)
 
-print(userIDs)
 
 #creates a dictionary out of the userIDs matrix
 user_d = dict()
@@ -46,7 +46,7 @@ for i in range(0,1000):
     x = random.sample(keywords, itemAmount)
     itemIDs.append(x)
 
-print(itemIDs)
+
 #creates a dictionary out of the itemIDs matrix
 item_d = dict()
 key = 0
@@ -129,7 +129,6 @@ def findVids(word, V):
         for j in i:
             if (j == word):
                 listV.append(index) #adds index of video
-                #listV.append(V[index])
         index += 1
     return listV
 
@@ -152,8 +151,10 @@ def numVids(w, V):
     index = 0
     for i in V:
         for j in V[index]:
+            #checks if keyword is in video based on index
             if (j == w):
                 count += 1
+                #adds to j to escape loop once keyword found
                 j += len(V[index])
         index += 1
     return count
@@ -171,7 +172,6 @@ intersection set
 example call:
 intersectSet = intersection(dict[32], dict[532])
 '''
-#finds intersecting set between two sets (videos)
 def intersection(lst1, lst2): 
     lst3 = [value for value in lst1 if value in lst2] 
     return lst3
@@ -194,10 +194,15 @@ dist = distanceOfVids(32, 397, item_d, itemIDs)
 def distanceOfVids(id1, id2, D, V):
     N = len(D)
     dist = []
+    #checks types to ensure no integers are being passed
+    #to the intersection function
+    if type(D.get(id1)) is type(dist) and type(D.get(id2)) is type(dist):
+        intersect = intersection(D.get(id1), D.get(id2))
+        
+        #over set of intersection, add calculated difference
+        for i in intersect:
+            dist.append(math.log10(N/numVids(i, V)))
     
-    intersect = intersection(D.get(id1), D.get(id2))
-    for i in intersect:
-        dist.append(math.log10(N/numVids(i, V)))
     
     sumOfVid = 0
     for i in dist:
@@ -213,27 +218,29 @@ input:
 index = index of video to be compared
 D = dictionary in question
 V = dataset in question
+user = user id in question
 
 output:
 list of distances between all videos and indexed video
 
 example call:
-dist[] = distances(451, item_d, itemIDs)
+dist = distances(451, item_d, itemIDs, user)
 '''
 def distances(index, D, V):
     N = len(D)
-    dist = []
+    distSum = 0
+    #gets unseen dictionary
+    unseen = findUnseen(user, seenUnseen, D)
     for v in range(0, N):
-        if (v == index):
-            dist.append(-1)
+        #if v is the current video or it has been seen
+        #do not count towards sum if either are true
+        if (v is index or v in unseen):
+            distSum += 0
         else:
             check = distanceOfVids(index, v, D, V)
-            if check is 0:
-                dist.append(50)
-            else:
-                dist.append(check)
+            distSum += check
     
-    return dist
+    return distSum
 
 '''
 based on the distance between videos
@@ -242,6 +249,7 @@ find relevance
 input:
 V = list of videos (each video has it's own list of keywords
 D = dictionary of videos
+user = user id in question
 
 output:
 relevance in a numerical value (the greater the number the greater relevance it holds)
@@ -249,31 +257,25 @@ relevance in a numerical value (the greater the number the greater relevance it 
 example call:
 relevance = relevance(item_d, itemIDs)
 '''
-def relevance(D, V):
-    rel = []
+def relevance(D, V, user):
+    rel = D
     index = 0
     for i in V:
-        rel.append(1/distances(index, D, V)[index])
+        #finds the sum of distances for each video
+        dist = sumDistances(index, D, V, user)
+        #if the sum is 0, no relation to any other vids
+        #then update with 0 otherwise update with inverse sum
+        if (dist != 0):
+            rel.update({index:1/dist})
+        else:
+            rel.update({index:0})
         index += 1
-    return rel
-
-'''
-sort videos in terms of relevance
-descending order
-for ascending order take out reverse parameter
-
-input:
-V = list of videos (each video has it's own list of keywords
-D = dictionary of videos
-
-output:
-list of relevances in sorted descending order
-
-example call:
-sortedRel = sortRel(item_d, itemIDs)
-'''
-def sortRel(D, V):
-    return sorted(range(len(relevance(D, V))), key=relevance(D, V).__getitem__, reverse=True)
+    #sorts relevance scores in descending order
+    sortedrel = sorted(rel.items(), key=lambda kv: kv[1], reverse=True)
+    #puts relevance scores in ordered dictionary
+    sortrel = collections.OrderedDict(sortedrel)
+    
+    return sortrel
 
 
 '''
@@ -293,16 +295,23 @@ top3(0, item_d, itemIDs, userIDs)
 '''
 def top3(user, D, V, U):
     sortedRel = sortRel(D, V)
-    
     recommend = []
     vids = []
+    
+    #loops through user's tags to find vids according to those tags
     for word in U[user]:
         vids.append(findVids(word, V))
     
+    #find unseen dictionary
     unseen = findUnseen(user, seenUnseen, D)
+    
+    #iterates sorted relevance, i is index in sortedRel
     for i in sortedRel:
+        #k is a keyword in V[i] which is being iterated through
         for k in V[i]:
+            #iterates through vids that share a keyword
             for v in vids:
+                #finds keyword in shared keyword videos
                 for relK in v:
                     #checks if relevant k is k (indices)
                     #also checks if k is unseen

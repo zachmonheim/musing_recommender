@@ -313,16 +313,18 @@ def top3(user, D, V, U):
             for v in vids:
                 #finds keyword in shared keyword videos
                 for relK in v:
+                    #no duplicates in recommend
+                    duplicate = set(recommend)
                     #checks if relevant k is k (indices)
                     #also checks if k is unseen
-                    if relK is k and k in unseen:
+                    if relK is k and k in unseen and i not in duplicate:
                         recommend.append(i)
     
     print(recommend)
-    print("Top three relevant videos for user 1 are: " + str(sortedRel[0]) + ", " + str(sortedRel[1]) + ", and " + str(sortedRel[2]))
     rec1 = "N/A"
     rec2 = "N/A"
     rec3 = "N/A"
+    
     if (len(recommend) >= 3):
         rec3 = str(recommend[2])
     if (len(recommend) >= 2):
@@ -330,6 +332,6 @@ def top3(user, D, V, U):
     if (len(recommend) >= 1):
         rec1 = str(recommend[0])
         
-    print("Top three relevant videos for user 1 are: " + rec1 + ", " + rec2 + ", and " + rec3)
+    print("Top three relevant videos for user " + str(user) + " are: " + rec1 + ", " + rec2 + ", and " + rec3)
 
 

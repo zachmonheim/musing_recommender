@@ -339,5 +339,6 @@ def top3(userID, D, V, U):
 #used to determine execution time of program
 import time
 start_time = time.time()
+#run program with user ID of 0
 top3(0, item_d, itemIDs, userIDs)
 print("--- %s seconds ---" % (time.time() - start_time))

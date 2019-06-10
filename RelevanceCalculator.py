@@ -29,7 +29,7 @@ for i in range(0,1000):
     userIDs.append(x)
 
 
-#creates a dictionary out of the userIDs matrix
+#creates a dictionary out of the userIDs matrix to keep track of IDs throughout
 user_d = dict()
 key = 0
 for i in userIDs:
@@ -226,7 +226,7 @@ list of distances between all videos and indexed video
 example call:
 dist = distances(451, item_d, itemIDs, user)
 '''
-def distances(index, D, V):
+def sumDistances(index, D, V, user):
     N = len(D)
     distSum = 0
     #gets unseen dictionary
@@ -255,7 +255,7 @@ output:
 relevance in a numerical value (the greater the number the greater relevance it holds)
 
 example call:
-relevance = relevance(item_d, itemIDs)
+relevance = relevance(item_d, itemIDs, 0)
 '''
 def relevance(D, V, user):
     rel = D
@@ -283,6 +283,7 @@ finds top 3 recommended videos for specific user
 only includes unseen videos
 
 input:
+userID = the id number of the user to find relevance for
 D = dictionary of videos
 V = list of videos (each video has it's own list of keywords
 U = list of users (each user has it's own list of keywords
@@ -293,17 +294,18 @@ prints out top 3 videos based on relevance to user
 example call:
 top3(0, item_d, itemIDs, userIDs)
 '''
-def top3(user, D, V, U):
-    sortedRel = sortRel(D, V)
+def top3(userID, D, V, U):
+    sortedRel = relevance(D, V, userID)
     recommend = []
     vids = []
     
+    #creates the U of R(U, v)
     #loops through user's tags to find vids according to those tags
-    for word in U[user]:
+    for word in U[userID]:
         vids.append(findVids(word, V))
     
     #find unseen dictionary
-    unseen = findUnseen(user, seenUnseen, D)
+    unseen = findUnseen(userID, seenUnseen, D)
     
     #iterates sorted relevance, i is index in sortedRel
     for i in sortedRel:
@@ -332,6 +334,10 @@ def top3(user, D, V, U):
     if (len(recommend) >= 1):
         rec1 = str(recommend[0])
         
-    print("Top three relevant videos for user " + str(user) + " are: " + rec1 + ", " + rec2 + ", and " + rec3)
+    print("Top three relevant videos for user " + str(userID) + " are: " + rec1 + ", " + rec2 + ", and " + rec3)
 
-
+#used to determine execution time of program
+import time
+start_time = time.time()
+top3(0, item_d, itemIDs, userIDs)
+print("--- %s seconds ---" % (time.time() - start_time))

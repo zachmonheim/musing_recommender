@@ -195,7 +195,7 @@ def distanceOfVids(id1, id2, D, V):
     N = len(D)
     dist = []
     #checks types to ensure no integers are being passed
-    #to the intersection function
+    #to the intersection function so no intersections are repeated
     if type(D.get(id1)) is type(dist) and type(D.get(id2)) is type(dist):
         intersect = intersection(D.get(id1), D.get(id2))
         

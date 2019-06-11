@@ -42,7 +42,8 @@ for i in userIDs:
 itemIDs = []
 
 for i in xrange(0,1000):
-    itemAmount = random.randint(1, 15)
+    #change second number to change number or keywords per video
+    itemAmount = random.randint(1, 5)
     x = random.sample(keywords, itemAmount)
     itemIDs.append(x)
 
@@ -59,7 +60,8 @@ for i in itemIDs:
 #rows are user id's and columns are video id's
 rows = len(userIDs)
 cols = len(itemIDs)
-seenUnseen = numpy.random.choice([x for x in xrange(0, 2, 1)], rows*cols)
+#weight 1:9 the unseen to seen
+seenUnseen = numpy.random.choice([x for x in xrange(0, 2, 1)], rows*cols, p=[0.9, 0.1])
 seenUnseen.resize(rows,cols)
 
 

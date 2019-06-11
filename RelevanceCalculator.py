@@ -23,7 +23,7 @@ while (keys < 1000):
 #represents the user profiles
 userIDs = []
 
-for i in range(0,1000):
+for i in xrange(0,1000):
     userAmount = random.randint(1, 15)
     x = random.sample(keywords, userAmount)
     userIDs.append(x)
@@ -41,7 +41,7 @@ for i in userIDs:
 #represents the tags on a video
 itemIDs = []
 
-for i in range(0,1000):
+for i in xrange(0,1000):
     itemAmount = random.randint(1, 15)
     x = random.sample(keywords, itemAmount)
     itemIDs.append(x)
@@ -80,9 +80,10 @@ unseenDict = findUnseen(392, seenUnseen, item_d)
 '''
 def findUnseen(user, unseen, D):
     diction = {}
+    default = diction.setdefault
     for i in range(0, len(D)):
         if unseen[user][i] == 0:
-            diction.setdefault(i, D[i])
+            default(i, D[i])
     
     return diction
 
@@ -103,9 +104,10 @@ seenDict = findSeen(392, seenUnseen, item_d)
 '''
 def findSeen(user, seen, D):
     diction = {}
+    default = diction.setdefault
     for i in range(0, len(D)):
         if seen[user][i] == 1:
-            diction.setdefault(i, D[i])
+            default(i, D[i])
     
     return diction
 
@@ -125,10 +127,11 @@ listOfIDs = findVids(423, itemIDs)
 def findVids(word, V):
     listV = []
     index = 0
+    append = listV.append
     for i in V:
         for j in i:
             if (j == word):
-                listV.append(index) #adds index of video
+                append(index) #adds index of video
         index += 1
     return listV
 
@@ -194,14 +197,19 @@ dist = distanceOfVids(32, 397, item_d, itemIDs)
 def distanceOfVids(id1, id2, D, V):
     N = len(D)
     dist = []
+    logg = math.log10
+    append = dist.append
+    lst1 = D.get(id1)
+    lst2 = D.get(id2)
+    
     #checks types to ensure no integers are being passed
     #to the intersection function so no intersections are repeated
-    if type(D.get(id1)) is type(dist) and type(D.get(id2)) is type(dist):
-        intersect = intersection(D.get(id1), D.get(id2))
+    if type(lst1) is type(dist) and type(lst2) is type(dist):
+        intersect = intersection(lst1, lst2)
         
         #over set of intersection, add calculated difference
         for i in intersect:
-            dist.append(math.log10(N/numVids(i, V)))
+            append(logg(N/numVids(i, V)))
     
     
     sumOfVid = 0
@@ -231,7 +239,7 @@ def sumDistances(index, D, V, user):
     distSum = 0
     #gets unseen dictionary
     unseen = findUnseen(user, seenUnseen, D)
-    for v in range(0, N):
+    for v in xrange(0, N):
         #if v is the current video or it has been seen
         #do not count towards sum if either are true
         if (v is index or v in unseen):
@@ -260,15 +268,17 @@ relevance = relevance(item_d, itemIDs, 0)
 def relevance(D, V, user):
     rel = D
     index = 0
+    
+    update = rel.update
     for i in V:
         #finds the sum of distances for each video
         dist = sumDistances(index, D, V, user)
         #if the sum is 0, no relation to any other vids
         #then update with 0 otherwise update with inverse sum
         if (dist != 0):
-            rel.update({index:1/dist})
+            update({index:1/dist})
         else:
-            rel.update({index:0})
+            update({index:0})
         index += 1
     #sorts relevance scores in descending order
     sortedrel = sorted(rel.items(), key=lambda kv: kv[1], reverse=True)
@@ -299,28 +309,29 @@ def top3(userID, D, V, U):
     recommend = []
     vids = []
     
+    vidAppend = vids.append
     #creates the U of R(U, v)
     #loops through user's tags to find vids according to those tags
     for word in U[userID]:
-        vids.append(findVids(word, V))
+        vidAppend(findVids(word, V))
     
     #find unseen dictionary
     unseen = findUnseen(userID, seenUnseen, D)
     
+    recAppend = recommend.append
     #iterates sorted relevance, i is index in sortedRel
     for i in sortedRel:
-        #k is a keyword in V[i] which is being iterated through
-        for k in V[i]:
-            #iterates through vids that share a keyword
-            for v in vids:
-                #finds keyword in shared keyword videos
-                for relK in v:
-                    #no duplicates in recommend
-                    duplicate = set(recommend)
-                    #checks if relevant k is k (indices)
-                    #also checks if k is unseen
-                    if relK is k and k in unseen and i not in duplicate:
-                        recommend.append(i)
+        #iterates through vids that share a keyword
+        for v in vids:
+            #k is a keyword in V[i] which is being iterated through
+            #relK finds keyword in shared keyword videos
+            for k, relK in product(V[i], v):
+                #no duplicates in recommend
+                duplicate = set(recommend)
+                #checks if relevant k is k (indices)
+                #also checks if k is unseen
+                if relK is k and k in unseen and i not in duplicate:
+                    recAppend(i)
     
     print(recommend)
     rec1 = "N/A"
@@ -342,3 +353,7 @@ start_time = time.time()
 #run program with user ID of 0
 top3(0, item_d, itemIDs, userIDs)
 print("--- %s seconds ---" % (time.time() - start_time))
+
+#used to determine execution time of functions
+import profile
+profile.run('top3(456, item_d, itemIDs, userIDs)')

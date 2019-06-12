@@ -13,6 +13,9 @@ import pandas as pd
 import numpy as np
 from builtins import int
 
+#links MatrixFactorization module to use MF class
+from Recommenders.MatrixFactorization import MF
+
 #read in csv file
 data = pd.read_csv('dataset.csv')
 
@@ -33,12 +36,6 @@ for i in range(0, scoreSize):
     currUser = data.get(['user_id']).to_numpy()[i]
     currItem = data.get(['item_id']).to_numpy()[i]
     
-    print(currWatchTime)
-    print(currItem)
-    print(currUser)
-    print(currShared)
-    print(currLiked)
-    
     #if the item id or user id is larger than previous ids, replace n and/or m
     if(currItem > m):
         m = currItem[0]
@@ -46,28 +43,15 @@ for i in range(0, scoreSize):
         n = currUser[0]
     
     #determine weights
-    A = 1
+    A = 1/600
     B = 1
     C = 1
     
-    #regularizes watch time to not overpower score
-    if (currWatchTime > 1200):
-        currWatchTime = 3
-    elif (currWatchTime > 800):
-        currWatchTime = 2
-    elif (currWatchTime > 400):
-        currWatchTime = 1
-    else:
-        currWatchTime = 0
-    
     #calculates score based on weights
-    currScore = A*currWatchTime + B*currLiked + C*currShared
-    
-    print(currScore)
+    currScore = int(round(A*currWatchTime[0])) + B*currLiked + C*currShared
     
     #adds calculated score to scores array of tuples
     scores[i] = [currScore, currUser, currItem]
-    print(scores)
 
 
 score_matrix = np.empty([n + 1, m + 1])
@@ -77,3 +61,10 @@ for i in range(scoreSize):
 
 print(score_matrix)
 
+#uses matrix factorization to train and print matrix with a collaborative filter
+mf = MF(score_matrix, K=9, alpha=0.1, beta=0.01, iterations=20)
+mf.train()
+print(mf.sgd())
+print(mf.get_rating(4, 3))
+np.set_printoptions(precision=3)
+print(mf.full_matrix())

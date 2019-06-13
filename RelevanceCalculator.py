@@ -40,13 +40,13 @@ specified user
 input:
 user = user specified to adjust dictionary to
 unseen = matrix of seen and unseen
-D = existing dictionary of items
+D = existing dictionary of videos
 
 output:
 dictionary of unseen videos
 
 example call:
-unseenDict = findUnseen(392, seenUnseen, item_d)
+unseenDict = findUnseen(392, seenUnseen, video_d)
 '''
 def findUnseen(user, unseen, D):
     diction = {}
@@ -64,7 +64,7 @@ specified user
 input:
 user = user specified to adjust dictionary to
 unseen = matrix of seen and unseen
-D = existing dictionary of items
+D = existing dictionary of videos
 
 output:
 dictionary of seen videos

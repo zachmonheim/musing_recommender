@@ -21,13 +21,13 @@ def load_obj(name ):
 userIDs = load_obj("user_IDs")
 
 #loads videoIDs matrix
-videoIDs = load_obj("item_IDs")
+videoIDs = load_obj("video_IDs")
 
 #loads dictionary from file
 user_d = load_obj("user_dict")
 
 #loads dictionary from file
-item_d = load_obj("item_dict")
+video_d = load_obj("video_dict")
 
 #loads matrix from file
 seenUnseen = load_obj("seenUnseen_matrix")
@@ -70,7 +70,7 @@ output:
 dictionary of seen videos
 
 example call:
-seenDict = findSeen(392, seenUnseen, item_d)
+seenDict = findSeen(392, seenUnseen, video_d)
 '''
 def findSeen(user, seen, D):
     diction = {}
@@ -92,7 +92,7 @@ output:
 list of video ids
 
 example call:
-listOfIDs = findVids(423, itemIDs)
+listOfIDs = findVids(423, videoIDs)
 '''
 def findVids(word, V):
     listV = []
@@ -121,15 +121,13 @@ f(w) = numVids(321, keywords)
 '''
 def numVids(w, V):
     count = 0
-    index = 0
-    for i in V:
-        for j in V[index]:
+    for v in V:
+        for i in v:
             #checks if keyword is in video based on index
-            if (j == w):
+            if (i == w):
                 count += 1
                 #adds to j to escape loop once keyword found
-                j += len(V[index])
-        index += 1
+                i += len(v)
     return count
 
 '''
@@ -162,13 +160,12 @@ output:
 distance between the two videos
 
 example call:
-dist = distanceOfVids(32, 397, item_d, itemIDs)
+dist = distanceOfVids(32, 397, video_d, videoIDs)
 '''
 def distanceOfVids(id1, id2, D, V):
     N = len(D)
     dist = []
     logg = math.log10
-    append = dist.append
     lst1 = D.get(id1)
     lst2 = D.get(id2)
     
@@ -178,8 +175,7 @@ def distanceOfVids(id1, id2, D, V):
         intersect = intersection(lst1, lst2)
         
         #over set of intersection, add calculated difference
-        for i in intersect:
-            append(logg(N/numVids(i, V)))
+        dist = [logg(N/numVids(i, V)) for i in intersect]
     
     
     sumOfVid = 0
@@ -202,7 +198,7 @@ output:
 list of distances between all videos and indexed video
 
 example call:
-dist = distances(451, item_d, itemIDs, user)
+dist = distances(451, video_d, videoIDs, user)
 '''
 def sumDistances(index, D, V, user):
     N = len(D)
@@ -233,7 +229,7 @@ output:
 relevance in a numerical value (the greater the number the greater relevance it holds)
 
 example call:
-relevance = relevance(item_d, itemIDs, 0)
+relevance = relevance(video_d, videoIDs, 0)
 '''
 def relevance(D, V, user):
     rel = D
@@ -272,7 +268,7 @@ output:
 prints out top 3 videos based on relevance to user
 
 example call:
-top3(0, item_d, itemIDs, userIDs)
+top3(0, video_d, videoIDs, userIDs)
 '''
 def top3(userID, D, V, U):
     sortedRel = relevance(D, V, userID)
@@ -321,9 +317,9 @@ def top3(userID, D, V, U):
 import time
 start_time = time.time()
 #run program with user ID of 0
-top3(0, item_d, itemIDs, userIDs)
+top3(0, video_d, videoIDs, userIDs)
 print("--- %s seconds ---" % (time.time() - start_time))
 
 #used to determine execution time of functions
 import profile
-profile.run('top3(456, item_d, itemIDs, userIDs)')
+profile.run('top3(456, video_d, videoIDs, userIDs)')

@@ -12,7 +12,7 @@ import numpy
 from pip._vendor.msgpack.fallback import xrange
 import collections
 
-#create list of 1000 keywords
+#create list of 1000 keywords - change number to adjust amount of keywords
 keywords = []
 keys = 0
 while (keys < 1000):
@@ -23,7 +23,9 @@ while (keys < 1000):
 #represents the user profiles
 userIDs = []
 
+#change second number to change number of users
 for i in xrange(0,1000):
+    #change second number to adjust max number of keywords any user may have
     userAmount = random.randint(1, 15)
     x = random.sample(keywords, userAmount)
     userIDs.append(x)
@@ -41,8 +43,10 @@ for i in userIDs:
 #represents the tags on a video
 itemIDs = []
 
+
+#change second number to change number of videos
 for i in xrange(0,1000):
-    #change second number to change number or keywords per video
+    #change second number to adjust max number of keywords any video may have
     itemAmount = random.randint(1, 5)
     x = random.sample(keywords, itemAmount)
     itemIDs.append(x)

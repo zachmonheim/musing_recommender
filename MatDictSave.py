@@ -40,27 +40,27 @@ for i in userIDs:
 
 #create a dataset with 1000 item IDs and assign a list of random keyword IDs based on a list of keywords
 #represents the tags on a video
-itemIDs = []
+videoIDs = []
 
 #change second number to change number of videos
 for i in xrange(0, 1000):
     #change second number to adjust max number of keywords any video may have
     itemAmount = random.randint(1, 15)
     x = random.sample(keywords, itemAmount)
-    itemIDs.append(x)
+    videoIDs.append(x)
 
-#creates a dictionary out of the itemIDs matrix
-item_d = dict()
+#creates a dictionary out of the videoIDs matrix
+video_d = dict()
 key = 0
-for i in itemIDs:
-    item_d.setdefault(key, i)
+for i in videoIDs:
+    video_d.setdefault(key, i)
     key += 1
 
 
 #generate matrix of seen and not seen
 #rows are user id's and columns are video id's
 rows = len(userIDs)
-cols = len(itemIDs)
+cols = len(videoIDs)
 #weight 1:9 the unseen to seen
 seenUnseen = numpy.random.choice([x for x in xrange(0, 2, 1)], rows*cols, p=[0.9, 0.1])
 
@@ -80,10 +80,10 @@ save_obj(userIDs, "user_IDs")
 save_obj(user_d, "user_dict")
 
 #saves itemID matrix into file
-save_obj(itemIDs, "item_IDs")
+save_obj(videoIDs, "video_IDs")
 
 #saves dictionary into file
-save_obj(item_d, "item_dict")
+save_obj(video_d, "video_dict")
 
 #saves matrix into file
 save_obj(seenUnseen, "seenUnseen_matrix")

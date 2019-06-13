@@ -17,4 +17,5 @@ pip install sklearn
 MatrixCreator #creates matrix after reading csv file
 MatrixFactorization #factorizes matrix with training algorithm
 RelevanceCalculator #find relevance of keywords for items based on users
+MatDictSave #randomly generates matrices and dictionaries for RelevanceCalculator
 ```

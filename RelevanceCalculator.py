@@ -273,13 +273,10 @@ top3(0, video_d, videoIDs, userIDs)
 def top3(userID, D, V, U):
     sortedRel = relevance(D, V, userID)
     recommend = []
-    vids = []
     
-    vidAppend = vids.append
     #creates the U of R(U, v)
     #loops through user's tags to find vids according to those tags
-    for word in U[userID]:
-        vidAppend(findVids(word, V))
+    vids = [findVids(word, V) for word in U[userID]]
     
     #find unseen dictionary
     unseen = findUnseen(userID, seenUnseen, D)
@@ -289,15 +286,15 @@ def top3(userID, D, V, U):
     for i in sortedRel:
         #iterates through vids that share a keyword
         for v in vids:
-            #k is a keyword in V[i] which is being iterated through
-            #relK finds keyword in shared keyword videos
-            for k, relK in product(V[i], v):
+            #relI is the index of videos that share keyword with user
+            for relI in v:
                 #no duplicates in recommend
                 duplicate = set(recommend)
-                #checks if relevant k is k (indices)
-                #also checks if k is unseen
-                if relK is k and k in unseen and i not in duplicate:
-                    recAppend(i)
+                #checks if relevant I is i (indices)
+                #also checks if relevant I is unseen and not a duplicate
+                if relI is i and relI in unseen and relI not in duplicate:
+                    #appends the video id
+                    recAppend(relI)
     
     print(recommend)
     rec1 = "N/A"

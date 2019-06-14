@@ -54,9 +54,9 @@ for i in range(0, scoreSize):
     scores[i] = [currScore, currUser, currItem]
 
 
-score_matrix = np.empty([n + 1, m + 1])
+score_matrix = np.zeros([n, m])
 for i in range(scoreSize):
-    score_matrix[int(scores[i][1]), int(scores[i][2])] = scores[i][0]
+    score_matrix[int(scores[i][1]-1), int(scores[i][2])-1] = scores[i][0]
 
 
 print(score_matrix)

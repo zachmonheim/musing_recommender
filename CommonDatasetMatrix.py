@@ -9,7 +9,6 @@ Created on Jun 14, 2019
 @author: Zach Monheim
 '''
 
-
 import numpy as np
 from builtins import int
 
@@ -38,12 +37,9 @@ size = len(ratings)
 #creates an array of zeros to hold [score, user_id, item_id]
 scores = np.zeros(shape=(size, 3))
 
-#size of empty score matrix should be numUsers by numVideos
 #n and m are used to find the dimensions of the matrix
 n=numUsers
 m=numVideos
-print(n)
-print(m)
 
 for i in range(0, size):
     #finds values at i for in dataset
@@ -53,13 +49,6 @@ for i in range(0, size):
     currShared = scoreTuple[i][1]
     currLiked = scoreTuple[i][2]
     
-    
-    ##use the numUsers and numVideos instead?
-    #if the video id or user id is larger than previous ids, replace n and/or m
-    if(currVideo > m):
-        m = currVideo
-    if(currUser > n):
-        n = currUser
     
     #determine weights
     A = 1/600
@@ -79,7 +68,7 @@ for i in range(0, size):
 #populates a score matrix with calculated scores
 score_matrix = np.zeros([n, m])
 for i in range(size):
-    score_matrix[int(scores[i][1]) - 1, int(scores[i][2]) - 1] = int(scores[i][0])
+    score_matrix[int(scores[i][1]), int(scores[i][2])] = int(scores[i][0])
 
 
 print(score_matrix)

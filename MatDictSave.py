@@ -12,6 +12,11 @@ import numpy
 from pip._vendor.msgpack.fallback import xrange
 import pickle
 
+#determines number of user ids
+numUsers = 1000
+#determines number of video ids
+numVideos = 1000
+
 #create list of 1000 keywords - change number to adjust amount of keywords
 keywords = []
 keys = 0
@@ -23,10 +28,10 @@ while (keys < 1000):
 #represents the user profiles
 userIDs = []
 
-#change second number to change number of users
-for i in xrange(0, 1000):
+#creates numUsers amount of users
+for i in xrange(0, numUsers):
     #change second number to adjust max number of keywords any user may have
-    userAmount = random.randint(1, 15)
+    userAmount = random.randint(1, 5)
     x = random.sample(keywords, userAmount)
     userIDs.append(x)
 
@@ -42,10 +47,10 @@ for i in userIDs:
 #represents the tags on a video
 videoIDs = []
 
-#change second number to change number of videos
-for i in xrange(0, 1000):
+#creates numVideos number of videos
+for i in xrange(0, numVideos):
     #change second number to adjust max number of keywords any video may have
-    itemAmount = random.randint(1, 15)
+    itemAmount = random.randint(1, 5)
     x = random.sample(keywords, itemAmount)
     videoIDs.append(x)
 
@@ -66,6 +71,87 @@ seenUnseen = numpy.random.choice([x for x in xrange(0, 2, 1)], rows*cols, p=[0.9
 
 seenUnseen.resize(rows,cols)
 
+'''
+creates list of tuples, to represent values for factorization
+tuple
+(userID, videoID, [secs watched, shared, watched])
+or
+nested tuples
+(userID, videoID, (secs watched, shared, watched))
+'''
+ratings = []
+
+for userid in xrange(0, numUsers):
+    for videoid in xrange(0, numVideos):
+        tup = [userid, videoid]
+        score = []
+        scAppend = score.append
+        #if unseen, no tuple will be added
+        if (seenUnseen[userid][videoid] == 1):
+            #randomize a secs watched, shared, liked
+            secWatched = random.randint(20, 1800)
+            shared = random.randint(0, 1)
+            liked = random.randint(0, 1)
+            scAppend(secWatched)
+            scAppend(shared)
+            scAppend(liked)
+            tup.append(score)
+            #add tuple to overall list
+            ratings.append(tuple(tup))
+
+
+import numpy as np
+from builtins import int
+
+'''
+creates matrix of 0s and nonzero values
+0s represent unseen n video of m user
+and nonzero values represent rating of n video by m user
+'''
+userids = [x[0] for x in ratings]
+videoids = [x[1] for x in ratings]
+scoreTuple = [x[2] for x in ratings]
+
+size = len(ratings)
+
+#creates an array of zeros to hold [score, user_id, item_id]
+scores = np.zeros(shape=(size, 3))
+
+#size of empty score matrix should be numUsers by numVideos
+#n and m are used to find the dimensions of the matrix
+n=numUsers
+m=numVideos
+
+
+for i in range(0, size):
+    #finds values at i for in dataset
+    currUser = userids[i]
+    currVideo = videoids[i]
+    currWatchTime = scoreTuple[i][0]
+    currShared = scoreTuple[i][1]
+    currLiked = scoreTuple[i][2]
+    
+    #determine weights
+    A = 1/600
+    B = 1
+    C = 1
+    
+    
+    #calculates score based on weights
+    currScore = int(round(A*currWatchTime)) + B*currLiked + C*currShared
+    
+    
+    #adds calculated score to scores array of tuples
+    scores[i] = [currScore, currUser, currVideo]
+
+
+
+#populates a score matrix with calculated scores
+score_matrix = np.zeros([n, m])
+for i in range(size):
+    score_matrix[int(scores[i][1]), int(scores[i][2])] = int(scores[i][0])
+
+
 
 #saves object into file
 def save_obj(obj, name ):
@@ -85,6 +171,9 @@ save_obj(videoIDs, "video_IDs")
 #saves dictionary into file
 save_obj(video_d, "video_dict")
 
-#saves matrix into file
-save_obj(seenUnseen, "seenUnseen_matrix")
+#saves ratings list into file
+save_obj(ratings, "ratings")
+
+#saves score matrix into file
+save_obj(score_matrix, "score_matrix")
 

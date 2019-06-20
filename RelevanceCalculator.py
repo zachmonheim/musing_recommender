@@ -10,7 +10,6 @@ import math
 from pip._vendor.msgpack.fallback import xrange
 import pickle
 import collections
-from itertools import product
 
 #loading object from file
 def load_obj(name ):
@@ -29,8 +28,8 @@ user_d = load_obj("user_dict")
 #loads dictionary from file
 video_d = load_obj("video_dict")
 
-#loads matrix from file
-seenUnseen = load_obj("seenUnseen_matrix")
+#loads score matrix
+score_matrix = load_obj("score_matrix")
 
 
 '''
@@ -39,47 +38,25 @@ specified user
 
 input:
 user = user specified to adjust dictionary to
-unseen = matrix of seen and unseen
+scores = matrix of seen and unseen
 D = existing dictionary of videos
 
 output:
 dictionary of unseen videos
 
 example call:
-unseenDict = findUnseen(392, seenUnseen, video_d)
+unseenDict = findUnseen(392, score_matrix, video_d)
 '''
-def findUnseen(user, unseen, D):
+def findUnseen(user, scores, D):
     diction = {}
     default = diction.setdefault
     for i in range(0, len(D)):
-        if unseen[user][i] == 0:
+        if scores[user][i] == 0:
             default(i, D[i])
     
     return diction
 
-'''
-creates new dictionary with only videos seen by a
-specified user
 
-input:
-user = user specified to adjust dictionary to
-unseen = matrix of seen and unseen
-D = existing dictionary of videos
-
-output:
-dictionary of seen videos
-
-example call:
-seenDict = findSeen(392, seenUnseen, video_d)
-'''
-def findSeen(user, seen, D):
-    diction = {}
-    default = diction.setdefault
-    for i in range(0, len(D)):
-        if seen[user][i] == 1:
-            default(i, D[i])
-    
-    return diction
 
 '''
 find vids function finds vids with a certain keyword
@@ -204,7 +181,7 @@ def sumDistances(index, D, V, user):
     N = len(D)
     distSum = 0
     #gets unseen dictionary
-    unseen = findUnseen(user, seenUnseen, D)
+    unseen = findUnseen(user, score_matrix, D)
     for v in xrange(0, N):
         #if v is the current video or it has been seen
         #do not count towards sum if either are true
@@ -279,7 +256,7 @@ def top3(userID, D, V, U):
     vids = [findVids(word, V) for word in U[userID]]
     
     #find unseen dictionary
-    unseen = findUnseen(userID, seenUnseen, D)
+    unseen = findUnseen(userID, score_matrix, D)
     
     recAppend = recommend.append
     #iterates sorted relevance, i is index in sortedRel

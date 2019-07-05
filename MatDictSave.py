@@ -177,3 +177,63 @@ save_obj(ratings, "ratings")
 #saves score matrix into file
 save_obj(score_matrix, "score_matrix")
 
+
+
+
+'''
+creating csv files
+changing matrices into a zipped file of csv files
+
+archive.zip
+    dataScore.csv
+    dataUser.csv
+    dataVideo.csv
+    
+    
+    
+dataScore
+user_id, video_id, score
+1, 1, 3
+1, 2, 4
+2, 1, 1
+etc.
+
+dataUser
+user_id, keyword1, keyword2, keyword3
+1, 13, 23, 26
+2, 5
+3, 1, 14
+'''
+
+#create matrix that corresponds with desired csv layout
+csvScoreMatrix = []
+csvAppend = csvScoreMatrix.append
+for u in xrange(numUsers):
+    for v in xrange(numVideos):
+        if (score_matrix[u][v] != 0):
+            csvAppend([u, v, score_matrix[u][v]])
+
+
+import pandas as pd
+
+##have to arrange as a single value for the keywords (array) currently each is separate feature
+#puts into dataframes
+dfUser = pd.DataFrame(userIDs, columns=['keyword1', 'keyword2', 'keyword3', 'keyword4'])
+dfVideo = pd.DataFrame(videoIDs, columns=['keyword1', 'keyword2', 'keyword3', 'keyword4'])
+dfScore = pd.DataFrame(csvScoreMatrix, columns=['user_id', 'video_id', 'score'])
+##how to save these interactions between user and video rather than making them all features of either a user or a video
+
+#adds IDs to data frame
+dfUser = dfUser.rename_axis(['user_id']).reset_index()
+dfVideo = dfVideo.rename_axis(['video_id']).reset_index()
+
+print(dfScore)
+print(dfUser)
+print(dfVideo)
+
+#puts dataframes into csv files
+dfUser.to_csv("dataUser.csv", encoding='utf-8', index=False)
+dfVideo.to_csv("dataVideo.csv", encoding='utf-8', index=False)
+dfScore.to_csv("dataScore.csv", encoding='utf-8', index=False)
+
+

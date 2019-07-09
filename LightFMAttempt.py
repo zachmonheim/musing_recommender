@@ -6,56 +6,6 @@ Created on Jun 13, 2019
 @author: Zach Monheim
 '''
 
-#attempt at creating dataset with lightFM Dataset class
-'''
-featList = ['user_keywords', 'video_keywords', 'score']
-itemid = ['1', '2', '3', '4', '5', '6']
-feattup = tuple([itemid, featList])
-
-listTup = []
-for itemID in xrange(1, numVideos):
-        
-        score = []
-        scAppend = score.append
-        
-        secWatched = str(random.randint(20, 1800))
-        shared = str(random.randint(0, 1))
-        liked = str(random.randint(0, 1))
-        scAppend(secWatched)
-        scAppend(shared)
-        scAppend(liked)
-        tup = [str(itemID), score]
-        #add tuple to overall list
-        listTup.append(tuple(tup))
-
-import lightfm
-from lightfm.data import Dataset
-
-#creates dataset with IDs for users and videos
-#and includes the features(keywords) for each
-##but how to incorperate scores?
-keywordsDataset = Dataset(True, True)
-keywordsDataset.fit(userids, videoids, userIDs, videoIDs)
-#keywordsDataset.build_interactions(userids, videoids)
-
-keywordsDataset.build_item_features(listTup)
-keywordsDataset.build_user_features(videoids, videoIDs)
-
-
-##will this keep the score connected to both IDs?
-ratingsDataset = Dataset(True, True)
-ratingsDataset.fit(userids, videoids, scoreTuple, scoreTuple)
-ratingsDataset.build_interactions(userids, videoids)
-
-ratingsDataset.build_item_features(userids, scoreTuple)
-ratingsDataset.build_user_features(videoids, scoreTuple)
-
-
-print(ratingsDataset)
-'''
-
-
-
 
 import os
 
@@ -201,13 +151,15 @@ def get_own_data():
         return (
             csv.DictReader(
                 (x.decode("utf-8", "ignore") for x in archive.open("dataScore.csv")),
-                delimiter=";",
+                delimiter=",",
             ),
             csv.DictReader(
-                (x.decode("utf-8", "ignore") for x in archive.open("dataUser.csv")), delimiter=";"
+                (x.decode("utf-8", "ignore") for x in archive.open("dataUser.csv")), 
+                delimiter=","
             ),
             csv.DictReader(
-                (x.decode("utf-8", "ignore") for x in archive.open("dataVideo.csv")), delimiter=";"
+                (x.decode("utf-8", "ignore") for x in archive.open("dataVideo.csv")), 
+                delimiter=","
             ),
         )
 
@@ -225,11 +177,6 @@ print(get_own_data()[0])
 
 ownRatings, user_keywords, video_keywords = get_own_data()
 
-## shows "user_id, video_id, score": "1, 2, 4"
-## should be "user_id":"1",
-#            "video_id":"2",
-#            "score":"4"
-
 for line in islice(ownRatings, 2):
 
     print(json.dumps(line, indent=4))
@@ -242,10 +189,7 @@ for line in islice(video_keywords, 1):
 
     print(json.dumps(line, indent=4))
     
-##don't know how to get the specific rows or columns
-##change the data format again?
-#separate file for creating this alternate dataset or within the same matdict save?
-#possibly use the matdict save loaded dictionaries and matrices to create new dataset
+
 ownDataset = Dataset()
 ownDataset.fit((x['user_id'] for x in get_score()),
             (x['video_id'] for x in get_score()))
@@ -258,16 +202,13 @@ print('Num users: {}, num_items {}.'.format(own_num_users, own_num_items))
 #Note that if we don't have all user and items ids at once, we can repeatedly call `fit_partial` to supply additional ids. In this case, we will use this capability to add some item feature mappings:
 
 ownDataset.fit_partial(items=(x['user_id'] for x in get_user_keywords()),
-
-                    item_features=(x['keyword1'] for x in get_user_keywords()))
+                    item_features=(x['keywords'] for x in get_user_keywords()))
 
 
 ownDataset.fit_partial(items=(x['video_id'] for x in get_video_keywords()),
-
-                    item_features=(x['keyword1'] for x in get_video_keywords()))
+                    item_features=(x['keywords'] for x in get_video_keywords()))
 
 (own_interactions, own_weights) = ownDataset.build_interactions(((x['user_id'], x['score'])
-
                                                       for x in get_score()))
 
 print(repr(own_interactions))
@@ -275,15 +216,14 @@ print(repr(own_interactions))
 #This is main input into a LightFM model: it encodes the interactions between users and items.
 
 #Since we have item features, we can also create the item features matrix:
-item_features = ownDataset.build_item_features(((x['video_id'], [x['keyword1']])
-
+item_features = ownDataset.build_item_features(((x['video_id'], [x['keywords']])
                                               for x in get_video_keywords()))
+
 print(repr(item_features))
 
 ## Building a model
 
 #This is all we need to build a LightFM model:
-
 
 model = LightFM(loss='bpr')
 

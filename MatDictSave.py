@@ -199,10 +199,11 @@ user_id, video_id, score
 etc.
 
 dataUser
-user_id, keyword1, keyword2, keyword3
-1, 13, 23, 26
-2, 5
-3, 1, 14
+user_id, keywords
+1, [13, 23, 26]
+2, [5]
+3, [1, 14]
+etc.
 '''
 
 #create matrix that corresponds with desired csv layout
@@ -213,23 +214,28 @@ for u in xrange(numUsers):
         if (score_matrix[u][v] != 0):
             csvAppend([u, v, score_matrix[u][v]])
 
+#creates matrix that has all keywords as one feature
+csvUsers = []
+userApp = csvUsers.append
+u = 0
+for k in userIDs:
+    userApp([u, k])
+    u += 1
+    
+#creates matrix that has all keywords as one feature
+csvVideos = []
+vidApp = csvVideos.append
+u = 0
+for k in userIDs:
+    vidApp([u, k])
+    u += 1
 
 import pandas as pd
 
-##have to arrange as a single value for the keywords (array) currently each is separate feature
 #puts into dataframes
-dfUser = pd.DataFrame(userIDs, columns=['keyword1', 'keyword2', 'keyword3', 'keyword4'])
-dfVideo = pd.DataFrame(videoIDs, columns=['keyword1', 'keyword2', 'keyword3', 'keyword4'])
+dfUser = pd.DataFrame(userIDs, columns=['user_id', 'keywords'])
+dfVideo = pd.DataFrame(videoIDs, columns=['video_id', 'keywords'])
 dfScore = pd.DataFrame(csvScoreMatrix, columns=['user_id', 'video_id', 'score'])
-##how to save these interactions between user and video rather than making them all features of either a user or a video
-
-#adds IDs to data frame
-dfUser = dfUser.rename_axis(['user_id']).reset_index()
-dfVideo = dfVideo.rename_axis(['video_id']).reset_index()
-
-print(dfScore)
-print(dfUser)
-print(dfVideo)
 
 #puts dataframes into csv files
 dfUser.to_csv("dataUser.csv", encoding='utf-8', index=False)
@@ -237,3 +243,17 @@ dfVideo.to_csv("dataVideo.csv", encoding='utf-8', index=False)
 dfScore.to_csv("dataScore.csv", encoding='utf-8', index=False)
 
 
+import os
+import zipfile
+
+#compresses csv files into a zipped file
+#replace path with wherever this file is save
+new_zip = zipfile.ZipFile('*file path ending in archive.zip*', 'w')
+
+for folder, subfolders, files in os.walk('*file path*'):
+    
+    for file in files:
+        if file.startswith('dataScore') or file.startswith('dataUser') or file.startswith('dataVideo'):
+            new_zip.write(os.path.join(folder, file), os.path.relpath(os.path.join(folder,file), '*file path*'), compress_type = zipfile.ZIP_DEFLATED)
+ 
+new_zip.close()
